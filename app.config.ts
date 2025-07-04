@@ -1,4 +1,4 @@
-import { defineConfig } from '@tanstack/react-start/config'
+import { defineConfig } from '@tanstack/react-start'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
@@ -6,7 +6,7 @@ export default defineConfig({
     appDirectory: 'src',
   },
   server: {
-    preset: 'netlify',
+    preset: 'node', // Change from 'netlify' to 'node' or another preset
   },
   vite: {
     plugins: [
