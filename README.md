@@ -30,3 +30,7 @@ The application expects the following environment variables:
 - `VITE_CONVEX_URL` – optional Convex backend URL
 - `VITE_SENTRY_DSN` – optional Sentry DSN
 
+When deploying with AWS Amplify, you can also store the OpenAI key as a secret
+named `VITE_OPENAI_API_KEY`. The server will load this secret automatically if
+the environment variables are not set.
+
