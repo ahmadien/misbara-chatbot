@@ -4,5 +4,4 @@ dist
 dist-ssr
 *.local
 .vinxi
-.netlify
 .env

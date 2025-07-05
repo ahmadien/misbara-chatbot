@@ -6,7 +6,7 @@ export default defineConfig({
     appDirectory: 'src',
   },
   server: {
-    preset: 'netlify', // Change from 'netlify' to 'node' or another preset
+    preset: 'node',
   },
   vite: {
     plugins: [
