@@ -28,5 +28,4 @@ The application expects the following environment variables:
 
 - `OPENAI_API_KEY` – your OpenAI API key
 - `VITE_CONVEX_URL` – optional Convex backend URL
-- `VITE_SENTRY_DSN` – optional Sentry DSN
 
