@@ -2,8 +2,13 @@
   "name": "misbara-chat",
   "private": true,
   "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "start": "vite"
+  },
   "dependencies": {
-    "@aws-amplify/backend": "^1.16.1",
     "@mui/material": "^7.2.0",
     "@sentry/react": "^9.5.0",
     "@sentry/vite-plugin": "^3.2.2",

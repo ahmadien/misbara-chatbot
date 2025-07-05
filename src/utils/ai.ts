@@ -1,5 +1,4 @@
 import { createServerFn } from '@tanstack/react-start'
-import { secret } from '@aws-amplify/backend'
 import OpenAI from 'openai'
 
 export interface Message {
