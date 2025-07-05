@@ -1,25 +1,12 @@
 import { hydrateRoot } from 'react-dom/client'
 import { StartClient } from '@tanstack/react-start'
-import * as Sentry from '@sentry/react'
-
 import { createRouter } from './router'
-import { initSentry } from './sentry'
-
-// Initialize Sentry (will be skipped if DSN is not defined)
-initSentry()
-
-const router = createRouter()
-
-// Choose the component wrapper depending on Sentry configuration
-const Root = process.env.SENTRY_DSN
-  ? Sentry.withErrorBoundary(StartClient, {
-      fallback: () => <div>An error has occurred. Our team has been notified.</div>,
-    })
-  : StartClient
 
 export default function Client() {
-  return <Root router={router} />
+  const router = createRouter()
+  return <StartClient router={router} />
 }
+
 
 // Hydrate on the client if we're in the browser
 if (typeof document !== 'undefined') {
