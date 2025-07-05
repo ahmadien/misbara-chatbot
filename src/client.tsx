@@ -1,4 +1,4 @@
-import { hydrateRoot } from 'react-dom/client'
+import { hydrateRoot, createRoot } from 'react-dom/client'
 import { StartClient } from '@tanstack/react-start'
 import { createRouter } from './router'
 
@@ -17,5 +17,9 @@ if (typeof document !== 'undefined') {
     document.body.appendChild(container)
   }
 
-  hydrateRoot(container, <Client />)
+  if (container.hasChildNodes()) {
+    hydrateRoot(container, <Client />)
+  } else {
+    createRoot(container).render(<Client />)
+  }
 }
