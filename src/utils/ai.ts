@@ -17,13 +17,25 @@ export const genAIResponse = createServerFn({ method: 'POST', response: 'raw' })
     }) => d,
   )
   .handler(async ({ data }) => {
-    // Check for API key in environment variables
-    const apiKey = process.env.OPENAI_API_KEY || import.meta.env.VITE_OPENAI_API_KEY
+    // Check for API key in environment variables or Amplify secrets
+    let apiKey = process.env.OPENAI_API_KEY || import.meta.env.VITE_OPENAI_API_KEY
 
     if (!apiKey) {
-      console.error('No OpenAI API key found');
+      try {
+        const { secret } = await import('@aws-amplify/backend')
+        const secretKey = await secret('VITE_OPENAI_API_KEY')
+        if (secretKey) {
+          apiKey = secretKey.toString()
+        }
+      } catch (err) {
+        console.warn('Unable to load AWS Amplify secret:', err)
+      }
+    }
+
+    if (!apiKey) {
+      console.error('No OpenAI API key found')
       throw new Error(
-        'Missing API key: Please set OPENAI_API_KEY in your environment variables or VITE_OPENAI_API_KEY in your .env file.'
+        'Missing API key: Please set OPENAI_API_KEY in your environment variables, VITE_OPENAI_API_KEY in your .env file, or add it as a secret in Amplify.'
       )
     }
 
