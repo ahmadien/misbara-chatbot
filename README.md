@@ -10,7 +10,7 @@ Misbara Chat is a simple AI chatbot powered by OpenAI. It is built with React us
 npm install
 ```
 
-2. Start the development server
+2. Start the development server (uses `vinxi` for SSR)
 
 ```bash
 npm run dev

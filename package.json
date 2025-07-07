@@ -3,10 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "vinxi dev",
+    "build": "vinxi build",
     "serve": "vite preview",
-    "start": "vite"
+    "start": "vinxi start"
   },
   "dependencies": {
     "@mui/material": "^7.2.0",
