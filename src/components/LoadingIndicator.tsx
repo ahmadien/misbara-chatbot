@@ -1,4 +1,3 @@
-import { AnimatedAiIcon } from './icons/AiIcons'
 import { useAppState } from '../store'
 import { translations } from '../utils'
 
@@ -8,9 +7,11 @@ export const LoadingIndicator = () => {
   return (
     <div className="px-6 py-6 bg-gradient-to-r from-red-600/5 to-red-600/5">
       <div className="flex items-start w-full max-w-3xl gap-4 mx-auto">
-        <AnimatedAiIcon className="w-12 h-12 flex-shrink-0" />
+        <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 ml-4 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-red-600 to-red-600">
+          AI
+        </div>
         <div className="relative flex-shrink-0 w-8 h-8">
-          <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-red-600 to-red-600 to-red-600 animate-[spin_2s_linear_infinite]"></div>
+          <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-red-600 to-red-600 animate-[spin_2s_linear_infinite]"></div>
           <div className="absolute inset-[2px] rounded-lg bg-black flex items-center justify-center text-white">
             <div className="relative flex items-center justify-center w-full h-full rounded-lg bg-gradient-to-r from-red-600 to-red-600">
               <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-red-600 to-red-600 animate-pulse"></div>

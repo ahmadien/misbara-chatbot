@@ -9,7 +9,7 @@ import {
   TopBar
 
 } from '../components'
-import { GoSidebarExpand } from 'react-icons/go'
+import { PlusCircle } from 'lucide-react'
 import { useConversations, useAppState, actions } from '../store'
 import { genAIResponse, type Message, HARMONY_PROMPT_AR, HARMONY_PROMPT_EN, PROMPT1_AR, PROMPT1_EN, translations } from '../utils'
 
@@ -50,16 +50,9 @@ function Home() {
   const [editingTitle, setEditingTitle] = useState('')
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const [pendingMessage, setPendingMessage] = useState<Message | null>(null)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsSidebarOpen(window.innerWidth >= 768)
-    }
-  }, [])
   const [error, setError] = useState<string | null>(null);
   const [systemPrompt, setSystemPrompt] = useState<string | null>(null)
-  const [inputDisabled, setInputDisabled] = useState(false)
+  const [inputDisabled, setInputDisabled] = useState(true) // Start disabled by default
 
   const scrollToBottom = useCallback(() => {
     if (messagesContainerRef.current) {
@@ -334,7 +327,7 @@ const processAIResponse = useCallback(async (conversationId: string, userMessage
     // Reset the current conversation so the welcome screen is shown
     setCurrentConversationId(null)
     setSystemPrompt(null)
-    setInputDisabled(false)
+    setInputDisabled(true) // Keep disabled for new chats
   }, [setCurrentConversationId])
 
   const handleDefineProblem = useCallback(async () => {
@@ -348,6 +341,7 @@ const processAIResponse = useCallback(async (conversationId: string, userMessage
     })
     setCurrentConversationId(id)
     setSystemPrompt(prompt)
+    setInputDisabled(false) // Enable input when problem is defined
     setInput('')
   }, [language, createNewConversation, addMessage, setCurrentConversationId])
 
@@ -366,29 +360,28 @@ const processAIResponse = useCallback(async (conversationId: string, userMessage
       <TopBar />
 
 
-      {/* Sidebar */}
-      {isSidebarOpen ? (
-        <Sidebar
-          conversations={conversations}
-          currentConversationId={currentConversationId}
-          handleNewChat={handleNewChat}
-          setCurrentConversationId={setCurrentConversationId}
-          handleDeleteChat={handleDeleteChat}
-          editingChatId={editingChatId}
-          setEditingChatId={setEditingChatId}
-          editingTitle={editingTitle}
-          setEditingTitle={setEditingTitle}
-          handleUpdateChatTitle={handleUpdateChatTitle}
-          onClose={() => setIsSidebarOpen(false)}
-        />
-      ) : (
-        <button
-          onClick={() => setIsSidebarOpen(true)}
-          className={`fixed top-1/2 z-10 -translate-y-1/2 bg-red-600 p-2 text-white ${language === 'ar' ? 'right-0 rounded-l-lg' : 'left-0 rounded-r-lg'}`}
-        >
-          <GoSidebarExpand className="w-5 h-5" />
-        </button>
-      )}
+      {/* Sidebar - Always show on desktop, hidden on mobile */}
+      <Sidebar
+        conversations={conversations}
+        currentConversationId={currentConversationId}
+        handleNewChat={handleNewChat}
+        setCurrentConversationId={setCurrentConversationId}
+        handleDeleteChat={handleDeleteChat}
+        editingChatId={editingChatId}
+        setEditingChatId={setEditingChatId}
+        editingTitle={editingTitle}
+        setEditingTitle={setEditingTitle}
+        handleUpdateChatTitle={handleUpdateChatTitle}
+      />
+
+      {/* Floating New Chat Button - Only on mobile */}
+      <button
+        onClick={handleNewChat}
+        className="fixed bottom-32 right-4 z-20 md:hidden bg-red-600 text-white p-4 rounded-full shadow-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-600"
+        title="New Chat"
+      >
+        <PlusCircle className="w-6 h-6" />
+      </button>
 
       {/* Main Content */}
       <div className="flex flex-col flex-1">
@@ -420,7 +413,6 @@ const processAIResponse = useCallback(async (conversationId: string, userMessage
               handleSubmit={handleSubmit}
               isLoading={isLoading}
               disabled={inputDisabled}
-              sidebarOpen={isSidebarOpen}
             />
           </>
         ) : (

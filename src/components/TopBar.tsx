@@ -1,55 +1,28 @@
-import { styled } from '@mui/material/styles'
-import Switch from '@mui/material/Switch'
+import { Globe, ChevronDown } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
 import { useAppState } from '../store'
-
-const LanguageSwitch = styled(Switch)(({ theme }) => ({
-  width: 62,
-  height: 34,
-  padding: 7,
-  '& .MuiSwitch-switchBase': {
-    margin: 1,
-    padding: 0,
-    transform: 'translateX(6px)',
-    '&.Mui-checked': {
-      color: '#fff',
-      transform: 'translateX(22px)',
-      '& .MuiSwitch-thumb:before': {
-        backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><text x="12" y="16" text-anchor="middle" font-size="12" font-family="Arial" fill="${encodeURIComponent('#fff')}" stroke="${encodeURIComponent('#000')}" stroke-width="0.5">AR</text></svg>')`,
-      },
-      '& + .MuiSwitch-track': {
-        opacity: 1,
-        backgroundColor: '#aab4be',
-        ...(theme.applyStyles && theme.applyStyles('dark', { backgroundColor: '#8796A5' })),
-      },
-    },
-  },
-  '& .MuiSwitch-thumb': {
-    backgroundColor: '#001e3c',
-    width: 32,
-    height: 32,
-    '&::before': {
-      content: "''",
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
-      left: 0,
-      top: 0,
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center',
-      backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><text x="12" y="16" text-anchor="middle" font-size="12" font-family="Arial" fill="${encodeURIComponent('#fff')}" stroke="${encodeURIComponent('#000')}" stroke-width="0.5">EN</text></svg>')`,
-    },
-    ...(theme.applyStyles && theme.applyStyles('dark', { backgroundColor: '#003892' })),
-  },
-  '& .MuiSwitch-track': {
-    opacity: 1,
-    backgroundColor: '#aab4be',
-    borderRadius: 20 / 2,
-    ...(theme.applyStyles && theme.applyStyles('dark', { backgroundColor: '#8796A5' })),
-  },
-}));
 
 export function TopBar() {
   const { language, setLanguage } = useAppState()
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleLanguageSelect = (lang: 'en' | 'ar') => {
+    setLanguage(lang)
+    setIsOpen(false)
+  }
 
   return (
     <div
@@ -57,10 +30,45 @@ export function TopBar() {
         language === 'ar' ? 'left-0' : 'right-0'
       }`}
     >
-      <LanguageSwitch
-        checked={language === 'ar'}
-        onChange={() => setLanguage(language === 'en' ? 'ar' : 'en')}
-      />
+      {/* Collapsible Language Dropdown */}
+      <div className="relative" ref={dropdownRef}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center gap-2 px-3 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 hover:bg-gray-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-600"
+        >
+          <Globe className="w-4 h-4" />
+          <span className="text-sm font-medium">{language.toUpperCase()}</span>
+          <ChevronDown 
+            className={`w-3.5 h-3.5 transition-transform duration-200 ${
+              isOpen ? 'rotate-180' : ''
+            }`} 
+          />
+        </button>
+
+        {/* Dropdown Menu */}
+        {isOpen && (
+          <div className="absolute top-full mt-1 right-0 bg-gray-800 border border-gray-700 rounded-lg shadow-lg overflow-hidden min-w-[120px] z-30">
+            <button
+              onClick={() => handleLanguageSelect('en')}
+              className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-700 transition-colors duration-150 flex items-center gap-2 ${
+                language === 'en' ? 'bg-red-600 text-white' : 'text-gray-300'
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              English
+            </button>
+            <button
+              onClick={() => handleLanguageSelect('ar')}
+              className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-700 transition-colors duration-150 flex items-center gap-2 ${
+                language === 'ar' ? 'bg-red-600 text-white' : 'text-gray-300'
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              العربية
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

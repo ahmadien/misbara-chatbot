@@ -7,8 +7,6 @@ export interface Message {
   content: string
 }
 
-// CORRECTED: Using the proper Responses API format
-
 export const genAIResponse = createServerFn({ method: 'POST', response: 'raw' })
   .validator(
     (d: {

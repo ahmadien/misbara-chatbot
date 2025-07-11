@@ -1,12 +1,12 @@
-import { createApp } from 'vinxi'
+import { defineConfig } from '@tanstack/react-start'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 
-export default createApp({
+export default defineConfig({
   tsr: {
     appDirectory: 'src',
   },
   server: {
-    preset: 'node',
+    preset: 'netlify',
   },
   vite: {
     plugins: [

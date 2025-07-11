@@ -31,7 +31,7 @@ export const WelcomeScreen = ({
     <div className="flex items-center justify-center flex-1 px-4 text-white">
       <div className="w-full max-w-3xl mx-auto text-center">
       <div className="flex justify-center mb-4">
-        <BrandLogo className="w-20 h-auto" />
+        <BrandLogo className="w-60 h-auto" />
       </div>
       <p className="w-full sm:w-2/3 mx-auto mb-6 text-lg text-gray-400">
         {t.welcomeSubtitle}
