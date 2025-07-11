@@ -39,7 +39,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html dir="rtl" lang="ar">
       <head>
         <HeadContent />
       </head>

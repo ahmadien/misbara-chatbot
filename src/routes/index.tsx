@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import {
   ChatMessage,
+  TypingMessage,
   LoadingIndicator,
   ChatInput,
   Sidebar,
@@ -53,17 +54,22 @@ function Home() {
   const [error, setError] = useState<string | null>(null);
   const [systemPrompt, setSystemPrompt] = useState<string | null>(null)
   const [inputDisabled, setInputDisabled] = useState(true) // Start disabled by default
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const scrollToBottom = useCallback(() => {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      })
     }
   }, []);
 
-  // Scroll to bottom when messages change or loading state changes
+  // Smooth scroll to bottom when messages change or loading state changes
   useEffect(() => {
-    scrollToBottom()
+    // Small delay to ensure DOM has updated
+    const timer = setTimeout(scrollToBottom, 50)
+    return () => clearTimeout(timer)
   }, [messages, isLoading, scrollToBottom])
 
   const createTitleFromInput = useCallback((text: string) => {
@@ -296,6 +302,15 @@ const processAIResponse = useCallback(async (conversationId: string, userMessage
         // We already have a conversation ID, add message directly to Convex
         console.log('Adding user message to existing conversation:', conversationId)
         await addMessage(conversationId, userMessage)
+        
+        // Check if this is the user's first actual message (after the initial assistant message)
+        // If so, update the conversation title based on their input
+        const userMessages = messages.filter(m => m.role === 'user')
+        if (userMessages.length === 0) {
+          // This is the first user message, update the conversation title
+          console.log('Updating conversation title to:', conversationTitle)
+          await updateConversationTitle(conversationId, conversationTitle)
+        }
       }
       
       // Process with AI after message is stored
@@ -321,7 +336,7 @@ const processAIResponse = useCallback(async (conversationId: string, userMessage
     } finally {
       setLoading(false)
     }
-  }, [input, isLoading, createTitleFromInput, currentConversationId, createNewConversation, addMessage, processAIResponse, setLoading]);
+  }, [input, isLoading, createTitleFromInput, currentConversationId, createNewConversation, addMessage, updateConversationTitle, processAIResponse, setLoading, messages]);
 
   const handleNewChat = useCallback(() => {
     // Reset the current conversation so the welcome screen is shown
@@ -333,11 +348,13 @@ const processAIResponse = useCallback(async (conversationId: string, userMessage
   const handleDefineProblem = useCallback(async () => {
     const instruction = language === 'ar' ? HARMONY_PROMPT_AR : HARMONY_PROMPT_EN
     const prompt = language === 'ar' ? PROMPT1_AR : PROMPT1_EN
-    const id = await createNewConversation('Problem')
+    const defaultTitle = language === 'ar' ? 'مشكلة جديدة' : 'New Problem'
+    const id = await createNewConversation(defaultTitle)
     await addMessage(id, {
       id: Date.now().toString(),
       role: 'assistant',
-      content: instruction
+      content: instruction,
+      isTyping: true // Mark this as a typing message
     })
     setCurrentConversationId(id)
     setSystemPrompt(prompt)
@@ -372,19 +389,20 @@ const processAIResponse = useCallback(async (conversationId: string, userMessage
         editingTitle={editingTitle}
         setEditingTitle={setEditingTitle}
         handleUpdateChatTitle={handleUpdateChatTitle}
+        onCollapseChange={setSidebarCollapsed}
       />
 
       {/* Floating New Chat Button - Only on mobile */}
       <button
         onClick={handleNewChat}
-        className="fixed bottom-32 right-4 z-20 md:hidden bg-red-600 text-white p-4 rounded-full shadow-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-600"
-        title="New Chat"
+        className="fixed bottom-32 end-4 z-20 md:hidden bg-red-600 text-white p-4 rounded-full shadow-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-600"
+        title={translations[language].newChat}
       >
         <PlusCircle className="w-6 h-6" />
       </button>
 
       {/* Main Content */}
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 pt-12 md:pt-0">
         {error && (
           <p className="w-full max-w-3xl p-4 mx-auto font-bold text-red-600">{error}</p>
         )}
@@ -398,9 +416,21 @@ const processAIResponse = useCallback(async (conversationId: string, userMessage
               <div className="w-full max-w-3xl px-4 mx-auto">
                 {[...messages, pendingMessage]
                   .filter((message): message is Message => message !== null)
-                  .map((message) => (
-                    <ChatMessage key={message.id} message={message} />
-                  ))}
+                  .map((message) => 
+                    message.isTyping ? (
+                      <TypingMessage 
+                        key={message.id} 
+                        message={message} 
+                        typingSpeed={10}
+                        onTypingComplete={() => {
+                          // Optional: Remove typing flag after completion
+                          // This allows the message to become a normal message
+                        }}
+                      />
+                    ) : (
+                      <ChatMessage key={message.id} message={message} />
+                    )
+                  )}
                 {isLoading && <LoadingIndicator />}
               </div>
             </div>
@@ -413,6 +443,7 @@ const processAIResponse = useCallback(async (conversationId: string, userMessage
               handleSubmit={handleSubmit}
               isLoading={isLoading}
               disabled={inputDisabled}
+              sidebarCollapsed={sidebarCollapsed}
             />
           </>
         ) : (

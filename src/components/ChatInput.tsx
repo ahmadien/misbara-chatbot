@@ -8,6 +8,7 @@ interface ChatInputProps {
   handleSubmit: (e: React.FormEvent) => Promise<void>;
   isLoading: boolean;
   disabled?: boolean;
+  sidebarCollapsed?: boolean;
 }
 
 export const ChatInput = ({
@@ -15,14 +16,15 @@ export const ChatInput = ({
   setInput,
   handleSubmit,
   isLoading,
-  disabled = false
+  disabled = false,
+  sidebarCollapsed = false
 }: ChatInputProps) => {
   const { language } = useAppState()
   const t = translations[language]
 
-  const offsetClass = language === 'ar'
-    ? 'left-0 md:right-64 right-0'
-    : 'right-0 md:left-64 left-0'
+  const offsetClass = sidebarCollapsed 
+    ? 'inset-x-0 md:ms-12' 
+    : 'inset-x-0 md:ms-64'
 
   return (
     <div

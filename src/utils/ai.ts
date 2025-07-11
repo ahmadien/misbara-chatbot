@@ -5,6 +5,7 @@ export interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
+  isTyping?: boolean
 }
 
 export const genAIResponse = createServerFn({ method: 'POST', response: 'raw' })
